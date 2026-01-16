@@ -1,12 +1,133 @@
-<!DOCTYPE html>
-<html>
-<body style="margin:0;height:100vh;display:flex;align-items:center;justify-content:center;font-size:2em;">
-<script>
-setInterval(()=>{
- document.body.style.backgroundColor =
- '#' + Math.floor(Math.random()*16777215).toString(16);
-},1000);
-</script>
-🎨 Color Flash
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Color Flash</title>
+  <style>
+    :root {
+      --transition-duration: 0.5s;
+    }
+    html,body {
+      height: 100%;
+      margin: 0;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 2rem;
+      color: white;
+      transition: background-color var(--transition-duration) ease, color var(--transition-duration) ease;
+      text-align: center;
+      padding: 1rem;
+    }
+    h1 {
+      margin: 0 0 0.75rem 0;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+    }
+    .controls {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+    button {
+      font-size: 1rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background: rgba(255,255,255,0.15);
+      color: inherit;
+      backdrop-filter: blur(4px);
+    }
+    button:focus {
+      outline: 2px dashed rgba(255,255,255,0.6);
+      outline-offset: 3px;
+    }
+    .color-code {
+      margin-top: 0.5rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <main role="main" aria-live="polite">
+    <h1>🎨 ¡Flashea conmigo!</h1>
+    <div class="color-code" id="colorCode">#ffffff</div>
+
+    <div class="controls">
+      <button id="toggleBtn" aria-pressed="true">Pausar</button>
+      <button id="onceBtn">Siguiente color</button>
+    </div>
+  </main>
+
+  <script>
+    // Return a hex color string always padded to 6 digits.
+    function randomColor() {
+      const n = Math.floor(Math.random() * 0xFFFFFF);
+      return '#' + n.toString(16).padStart(6, '0');
+    }
+
+    // Choose readable foreground color (black or white) based on luminance.
+    function readableTextColor(hex) {
+      const r = parseInt(hex.substr(1, 2), 16);
+      const g = parseInt(hex.substr(3, 2), 16);
+      const b = parseInt(hex.substr(5, 2), 16);
+      // YIQ formula
+      const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+      return yiq >= 128 ? '#000000' : '#ffffff';
+    }
+
+    const colorCodeEl = document.getElementById('colorCode');
+    const toggleBtn = document.getElementById('toggleBtn');
+    const onceBtn = document.getElementById('onceBtn');
+
+    let intervalId = null;
+    const intervalMs = 1000;
+
+    function applyColor(hex) {
+      document.body.style.backgroundColor = hex;
+      document.body.style.color = readableTextColor(hex);
+      colorCodeEl.textContent = hex;
+    }
+
+    function tick() {
+      applyColor(randomColor());
+    }
+
+    function start() {
+      if (intervalId) return;
+      tick(); // immediate first tick
+      intervalId = setInterval(tick, intervalMs);
+      toggleBtn.textContent = 'Pausar';
+      toggleBtn.setAttribute('aria-pressed', 'true');
+    }
+
+    function stop() {
+      if (!intervalId) return;
+      clearInterval(intervalId);
+      intervalId = null;
+      toggleBtn.textContent = 'Reanudar';
+      toggleBtn.setAttribute('aria-pressed', 'false');
+    }
+
+    // Controls
+    toggleBtn.addEventListener('click', () => {
+      if (intervalId) stop();
+      else start();
+    });
+
+    onceBtn.addEventListener('click', () => {
+      tick();
+    });
+
+    // Start automatically
+    start();
+  </script>
 </body>
 </html>
