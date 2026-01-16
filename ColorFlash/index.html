@@ -67,18 +67,15 @@
   </main>
 
   <script>
-    // Return a hex color string always padded to 6 digits.
     function randomColor() {
       const n = Math.floor(Math.random() * 0xFFFFFF);
       return '#' + n.toString(16).padStart(6, '0');
     }
 
-    // Choose readable foreground color (black or white) based on luminance.
     function readableTextColor(hex) {
       const r = parseInt(hex.substr(1, 2), 16);
       const g = parseInt(hex.substr(3, 2), 16);
       const b = parseInt(hex.substr(5, 2), 16);
-      // YIQ formula
       const yiq = (r * 299 + g * 587 + b * 114) / 1000;
       return yiq >= 128 ? '#000000' : '#ffffff';
     }
@@ -102,7 +99,7 @@
 
     function start() {
       if (intervalId) return;
-      tick(); // immediate first tick
+      tick();
       intervalId = setInterval(tick, intervalMs);
       toggleBtn.textContent = 'Pausar';
       toggleBtn.setAttribute('aria-pressed', 'true');
@@ -116,7 +113,6 @@
       toggleBtn.setAttribute('aria-pressed', 'false');
     }
 
-    // Controls
     toggleBtn.addEventListener('click', () => {
       if (intervalId) stop();
       else start();
@@ -126,7 +122,6 @@
       tick();
     });
 
-    // Start automatically
     start();
   </script>
 </body>
